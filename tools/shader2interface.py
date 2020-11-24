@@ -3,8 +3,9 @@ import re
 
 import extractglsl
 
-typevec = re.compile(r"(.)?vec([234])")
-typemat = re.compile(r"(d)?mat([234])x?([234])?")
+typevec     = re.compile(r"([biud])?vec([234])")
+typemat     = re.compile(r"(d)?mat([234])x?([234])?")
+typesampler = re.compile(r"([iu])?sampler(.+)")
 
 STYPE_VERT = "vert"
 STYPE_FRAG = "frag"
@@ -34,28 +35,36 @@ def matdim(mmat):
     x, y = matdims(mmat)
     return x * y
 
+def is_scalar(_type):
+    # Todo: arrays?
+    mvec     = typevec.match(_type)
+    mmat     = typemat.match(_type)
+
+    return not (mvec or mmat)
+
 def Ctype_of(_type):
     if _type == "uint" or _type == "bool":
-        return "uint32_t"
-    if _type == "int":
+        return "GLuint"
+    if _type == "GLint":
         return "int32_t"
-    if _type == "double":
-        return "float"
+    if _type == "double" or _type == "float":
+        return "GLfloat"
 
-    mvec = typevec.match(_type)
+    mvec     = typevec.match(_type)
+    mmat     = typemat.match(_type)
+    msampler = typesampler.match(_type)
+
     if mvec:
         __type = mvec.group(1)
         if __type == "b":
-            subtype = "bool"
+            subtype = "GLboolean"
         elif __type == "i":
-            subtype = "int32_t"
+            subtype = "GLint"
         elif __type == "u":
-            subtype = "uint32_t"
+            subtype = "GLuint"
         else: # What of "d"?
-            subtype = "float"
+            subtype = "GLfloat"
         return "std::array<" + subtype + ", " + mvec.group(2) + ">"
-
-    mmat = typemat.match(_type)
     if mmat:
         if mmat.group(1):
             subtype = "double"
@@ -65,13 +74,15 @@ def Ctype_of(_type):
         dim = matdim(mmat)
 
         return "std::array<" + subtype + ", " + str(dim) + ">"
+    if msampler:
+        return "GLint"
 
-
-    return _type
+    raise Exception("Ctype_of: unsupported type \"%s\"" % _type)
 
 def uniform_type_of(_type):
     mvec = typevec.match(_type)
     mmat = typemat.match(_type)
+    msampler = typesampler.match(_type)
 
     if _type == "uint" or _type == "bool":
         return "1uiv"
@@ -93,6 +104,9 @@ def uniform_type_of(_type):
         if x != y:
             return "Matrix" + str(x) + "x" + str(y) + "fv"
         return "Matrix" + str(x) + "fv"
+    elif msampler:
+        if msampler.group(1) == None:
+            return "1i"
 
 def type_arity(_type):
     mvec = typevec.match(_type)
@@ -225,10 +239,17 @@ class Shader:
         tmp = ""
         for name, _type in self.merged_uniforms.items():
             uniform_type = uniform_type_of(_type)
-            args = "(" + name + ", 1, "
-            if uniform_type[0] == "M": # Matrix
-                args += "GL_FALSE, "
-            args += "_" + name + ".data())"
+            scalar = is_scalar(_type)
+
+            args = "(" + name + ", "
+            if not scalar:
+                args += "1, "
+                if uniform_type[0] == "M": # Matrix
+                    args += "GL_FALSE, "
+            args += "_" + name
+            if not scalar:
+                args += ".data()"
+            args += ")"
 
             tmp +=    C_setter_prototype((name, _type), self.C_name() + "::") \
                     + "\n{\n" \

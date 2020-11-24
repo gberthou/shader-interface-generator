@@ -16,8 +16,10 @@ from shader2interface import *
 #    }
 # }
 
-with open(sys.argv[1], "r") as f:
-    os.chdir("shaders")
-    data = json.load(f)
-    types = list({STYPE_VERT, STYPE_FRAG, STYPE_GEO, STYPE_TCS, STYPE_TES} & data["shaders"].keys())
-    shader2interface(data["name"], data["shaders"], types)
+for filename in sys.argv[1:]:
+    with open(filename, "r") as f:
+        os.chdir("shaders")
+        data = json.load(f)
+        types = list({STYPE_VERT, STYPE_FRAG, STYPE_GEO, STYPE_TCS, STYPE_TES} & data["shaders"].keys())
+        shader2interface(data["name"], data["shaders"], types)
+        os.chdir("..")
