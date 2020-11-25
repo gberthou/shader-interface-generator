@@ -92,7 +92,6 @@ int main(void)
     );
     programWorld.Setuview(mat2array(view));
 
-    programWorld.Setumodel(mat2array(glm::mat4(1.)));
  
     // Bind the framebuffers to TEXTURE0 and TEXTURE1
     glActiveTexture(GL_TEXTURE0);
@@ -100,8 +99,15 @@ int main(void)
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, framebuffer1.GetColorTexture());
 
+    float t = 0.;
+
     while(ui.PollEvent())
     {
+        // Update model matrix
+        programWorld.Apply();
+        programWorld.Setumodel(mat2array(glm::rotate(glm::mat4(1.), t, glm::vec3(.5, .5, .5))));
+        t += .01;
+
         // First: Render World onto framebuffer
         framebuffer0.Bind();
         drawWorld(programWorld, cubeIndices);
@@ -111,7 +117,7 @@ int main(void)
         programScreen.Apply();
         programScreen.Setscreen(0);
         programScreen.Sethorizontal(true);
-        programScreen.Setnstep(width / 8);
+        programScreen.Setnstep(width / 4);
         framebuffer1.Bind();
         drawScreen(programScreen);
         framebuffer1.Unbind();
@@ -120,7 +126,7 @@ int main(void)
         //programScreen.Apply();
         programScreen.Setscreen(1);
         programScreen.Sethorizontal(false);
-        programScreen.Setnstep(height / 8);
+        programScreen.Setnstep(height / 4);
         drawScreen(programScreen);
 
         ui.Refresh();
