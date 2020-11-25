@@ -51,6 +51,9 @@ void RenderContext::Draw0(const std::function<void()> &draw) const
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, framebuffer.GetColorTexture());
 
+    programWorld.Apply();
+    programWorld.Bind();
+
     framebuffer.Bind();
     draw();
     framebuffer.Unbind();
@@ -58,6 +61,9 @@ void RenderContext::Draw0(const std::function<void()> &draw) const
 
 void RenderContext::Draw1(const std::function<void()> &draw) const
 {
+    programScreen.Apply();
+    programScreen.Bind();
+
     draw();
 }
 

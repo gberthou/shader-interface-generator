@@ -25,24 +25,6 @@ static void initTriangle(const ProgramWorld &program)
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 }
 
-static void drawWorld(const ProgramWorld &program)
-{
-    program.Apply();
-    program.Bind();
-
-    glClear(GL_COLOR_BUFFER_BIT);
-    glDrawArrays(GL_TRIANGLES, 0, 3);
-}
-
-static void drawScreen(const ProgramScreen &program)
-{
-    program.Apply();
-    program.Bind();
-
-    glClear(GL_COLOR_BUFFER_BIT);
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-}
-
 int main(void)
 {
     const unsigned int width = 800;
@@ -68,14 +50,16 @@ int main(void)
     while(ui.PollEvent())
     {
         // First: Render World onto the framebuffer
-        renderContext.Draw0(
-            [&programWorld]{drawWorld(programWorld);}
-        );
+        renderContext.Draw0([]{
+            glClear(GL_COLOR_BUFFER_BIT);
+            glDrawArrays(GL_TRIANGLES, 0, 3);
+        });
 
         // Second: Render Screen onto the screen
-        renderContext.Draw1(
-            [&programScreen]{drawScreen(programScreen);}
-        );
+        renderContext.Draw1([]{
+            glClear(GL_COLOR_BUFFER_BIT);
+            glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+        });
 
         ui.Refresh();
     }
