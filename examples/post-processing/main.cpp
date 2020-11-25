@@ -5,6 +5,7 @@
 
 #include "shaders/ProgramWorld.h"
 #include "shaders/ProgramScreen.h"
+#include "RenderContext.h"
 
 static void initGL(unsigned int width, unsigned int height)
 {
@@ -12,25 +13,12 @@ static void initGL(unsigned int width, unsigned int height)
     glClearColor(1, 1, 1, 1);
 }
 
-static void initSquare(const ProgramScreen &program)
+static void initTriangle(const ProgramWorld &program)
 {
-    const ProgramScreen::Vertex vertices[] = {
-        {
-            .aposition = {-1, -1},
-            .atexcoord = {0, 0}
-        },
-        {
-            .aposition = {-1, 1},
-            .atexcoord = {0, 1}
-        },
-        {
-            .aposition = {1, -1},
-            .atexcoord = {1, 0}
-        },
-        {
-            .aposition = {1, 1},
-            .atexcoord = {1, 1}
-        }
+    const ProgramWorld::Vertex vertices[] = {
+        {.aposition = {-.75, -.75}},
+        {.aposition = { .75, -.75}},
+        {.aposition = {   0,  .75}},
     };
 
     program.Bind();
@@ -63,17 +51,15 @@ int main(void)
     UI ui(width, height, "Hello World!");
 
     initGL(width, height);
-    Framebuffer framebuffer(width, height);
-
-    ProgramWorld  programWorld (FileContents("shaders/World.vert"),  FileContents("shaders/World.frag"));
-    ProgramScreen programScreen(FileContents("shaders/Screen.vert"), FileContents("shaders/Screen.frag"));
+    RenderContext renderContext(
+        width, height,
+        FileContents("shaders/World.vert"),  FileContents("shaders/World.frag"),
+        FileContents("shaders/Screen.vert"), FileContents("shaders/Screen.frag")
+    );
+    auto &programWorld = renderContext.GetProgram0();
+    auto &programScreen = renderContext.GetProgram1();
 
     initTriangle(programWorld);
-    initSquare(programScreen);
-
-    // Bind the framebuffer to TEXTURE0
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, framebuffer.GetColorTexture());
 
     // Set the uniform texture (named screen) to TEXTURE0
     programScreen.Bind();
@@ -81,13 +67,15 @@ int main(void)
 
     while(ui.PollEvent())
     {
-        // First: Render World onto framebuffer
-        framebuffer.Bind();
-        drawWorld(programWorld);
-        framebuffer.Unbind();
+        // First: Render World onto the framebuffer
+        renderContext.Draw0(
+            [&programWorld]{drawWorld(programWorld);}
+        );
 
         // Second: Render Screen onto the screen
-        drawScreen(programScreen);
+        renderContext.Draw1(
+            [&programScreen]{drawScreen(programScreen);}
+        );
 
         ui.Refresh();
     }
