@@ -12,18 +12,6 @@ static void initGL(unsigned int width, unsigned int height)
     glClearColor(1, 1, 1, 1);
 }
 
-static void initTriangle(const ProgramWorld &program)
-{
-    const ProgramWorld::Vertex vertices[] = {
-        {.aposition = {-.75, -.75}},
-        {.aposition = { .75, -.75}},
-        {.aposition = {   0,  .75}},
-    };
-
-    program.Bind();
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-}
-
 static void initSquare(const ProgramScreen &program)
 {
     const ProgramScreen::Vertex vertices[] = {

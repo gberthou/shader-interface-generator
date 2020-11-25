@@ -1,0 +1,3 @@
+gaussian-blur
+shaders/*.cpp
+shaders/*.h

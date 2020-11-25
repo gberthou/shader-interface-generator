@@ -85,11 +85,11 @@ def uniform_type_of(_type):
     msampler = typesampler.match(_type)
 
     if _type == "uint" or _type == "bool":
-        return "1uiv"
+        return "1ui"
     if _type == "int":
-        return "1iv"
+        return "1i"
     if _type == "float" or _type == "double":
-        return "1fv"
+        return "1f"
     if mvec:
         __type = mvec.group(1)
         n = mvec.group(2)
