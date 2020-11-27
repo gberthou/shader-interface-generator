@@ -3,9 +3,7 @@
 #include <utils.h>
 #include <framebuffer.h>
 
-#include "shaders/ProgramWorld.h"
-#include "shaders/ProgramScreen.h"
-#include "RenderContext.h"
+#include "shaders/ProgramDrawTechnique.h"
 
 static void initGL(unsigned int width, unsigned int height)
 {
@@ -25,6 +23,31 @@ static void initTriangle(const ProgramWorld &program)
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 }
 
+static void initSquare(const ProgramScreen &program)
+{
+    const ProgramScreen::Vertex vertices[] = {
+        {
+            .aposition = {-1, -1},
+            .atexcoord = {0, 0}
+        },
+        {
+            .aposition = {-1, 1},
+            .atexcoord = {0, 1}
+        },
+        {
+            .aposition = {1, -1},
+            .atexcoord = {1, 0}
+        },
+        {
+            .aposition = {1, 1},
+            .atexcoord = {1, 1}
+        }
+    };
+
+    program.Bind();
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+}
+
 int main(void)
 {
     const unsigned int width = 800;
@@ -33,7 +56,7 @@ int main(void)
     UI ui(width, height, "Hello World!");
 
     initGL(width, height);
-    RenderContext renderContext(
+    ProgramDrawTechnique renderContext(
         width, height,
         FileContents("shaders/World.vert"),  FileContents("shaders/World.frag"),
         FileContents("shaders/Screen.vert"), FileContents("shaders/Screen.frag")
@@ -42,6 +65,11 @@ int main(void)
     auto &programScreen = renderContext.GetProgram1();
 
     initTriangle(programWorld);
+    initSquare(programScreen);
+
+    // Bind the intermediate framebuffer to TEXTURE0
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, renderContext.GetFramebuffer0().GetColorTexture());
 
     // Set the uniform texture (named screen) to TEXTURE0
     programScreen.Bind();

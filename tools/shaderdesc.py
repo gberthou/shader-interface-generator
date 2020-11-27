@@ -182,8 +182,15 @@ class Shader:
     def C_name(self):
         return self.module_name()
 
+    def C_constructor_args(self, appendix = "", omittypes = False):
+        if not omittypes:
+            prefix = "const std::string &"
+        else:
+            prefix = ""
+        return ", ".join(prefix + C_code_arg(i) + appendix for i in self.shadertypes)
+
     def C_constructor(self, implem = False):
-        args = ", ".join("const std::string &" + C_code_arg(i) for i in self.shadertypes)
+        args = self.C_constructor_args()
         tmp = self.C_name() + "(" + args + ")"
         if implem:
             return self.C_name() + "::" + tmp
@@ -260,7 +267,7 @@ class Shader:
 
     def C_bind_source(self):
         return    C_bind_prototype(self.C_name() + "::") \
-                + "\n{\n    glBindVertexArray(vao);\nglBindBuffer(GL_ARRAY_BUFFER, vbo);\n}\n"
+                + "\n{\n    glBindVertexArray(vao);\n    glBindBuffer(GL_ARRAY_BUFFER, vbo);\n}\n"
 
     def C_class(self):
         v = Vertex(self.attributes)
@@ -276,20 +283,25 @@ class Shader:
                 + indent(self.C_members(), 2) + "\n" \
                 + "};"
 
+    def C_header_body(self):
+        return self.C_class()
+
     def C_header(self):
         CPP_VARIABLE = self.module_name().upper()
         return    "#ifndef " + CPP_VARIABLE + "\n" \
                 + "#define " + CPP_VARIABLE + "\n\n" \
                 + "#include <string>\n#include <array>\n#include <glutils.h>\n" \
-                + self.C_class() + "\n" \
-                + "#endif\n"
+                + self.C_header_body() \
+                + "\n#endif\n"
 
-    def C_source(self):
-        return    "#include <gl.h>\n#include \"" + self.header_name() + "\"\n\n" \
-                + self.C_constructor_source() \
+    def C_source_body(self):
+        return    self.C_constructor_source() \
                 + self.C_destructor_source() \
                 + self.C_bind_source() \
                 + self.C_setters_source()
+
+    def C_source(self):
+        return    "#include <gl.h>\n#include \"" + self.header_name() + "\"\n\n" + self.C_source_body() + "\n"
 
 class Vertex:
     def __init__(self, attributes):
@@ -300,7 +312,7 @@ class Vertex:
                 + indent("\n".join(map(C_default_attrib_member, self.attributes.items())), 1) \
                 + "\n};\n"
 
-def shader2interface(name, shader_desc, types):
+def to_shader(name, shader_desc, types):
     attributes_and_types = list()
     uniforms_and_types = list()
 
@@ -311,9 +323,4 @@ def shader2interface(name, shader_desc, types):
         uniforms_and_types.append(extractglsl.types_of(uniforms))
 
     shader = Shader(name, types, extractglsl.merge(attributes_and_types), extractglsl.merge(uniforms_and_types))
-
-    with open(shader.module_name() + ".h", "w") as f:
-        f.write(shader.C_header())
-
-    with open(shader.module_name() + ".cpp", "w") as f:
-        f.write(shader.C_source())
+    return shader
