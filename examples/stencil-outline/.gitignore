@@ -1,0 +1,3 @@
+stencil-outline
+shaders/*.cpp
+shaders/*.h
