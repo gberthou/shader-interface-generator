@@ -56,20 +56,20 @@ int main(void)
     UI ui(width, height, "Hello World!");
 
     initGL(width, height);
-    ProgramDrawTechnique renderContext(
+    ProgramDrawTechnique renderer(
         width, height,
         FileContents("shaders/World.vert"),  FileContents("shaders/World.frag"),
         FileContents("shaders/Screen.vert"), FileContents("shaders/Screen.frag")
     );
-    auto &programWorld = renderContext.GetProgram0();
-    auto &programScreen = renderContext.GetProgram1();
+    auto &programWorld = renderer.GetProgram0();
+    auto &programScreen = renderer.GetProgram1();
 
     initTriangle(programWorld);
     initSquare(programScreen);
 
     // Bind the intermediate framebuffer to TEXTURE0
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, renderContext.GetFramebuffer0().GetColorTexture());
+    glBindTexture(GL_TEXTURE_2D, renderer.GetFramebuffer0().GetColorTexture());
 
     // Set the uniform texture (named screen) to TEXTURE0
     programScreen.Bind();
@@ -78,13 +78,13 @@ int main(void)
     while(ui.PollEvent())
     {
         // First: Render World onto the framebuffer
-        renderContext.Draw0([]{
+        renderer.Draw0([]{
             glClear(GL_COLOR_BUFFER_BIT);
             glDrawArrays(GL_TRIANGLES, 0, 3);
         });
 
         // Second: Render Screen onto the screen
-        renderContext.Draw1([]{
+        renderer.Draw1([]{
             glClear(GL_COLOR_BUFFER_BIT);
             glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
         });
