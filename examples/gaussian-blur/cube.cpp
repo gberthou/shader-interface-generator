@@ -1,6 +1,6 @@
 #include "cube.h"
 
-void CubeInit(ProgramWorld &program, std::vector<GLuint> &indices)
+void CubeInit(const ProgramWorld &program, std::vector<GLuint> &indices)
 {
     const ProgramWorld::Vertex vertices[] = {
         // Top face

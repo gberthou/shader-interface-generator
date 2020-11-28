@@ -5,9 +5,9 @@
 
 #include <gl.h>
 
-#include "shaders/ProgramWorld.h"
+#include "shaders/ProgramDrawTechnique.h"
 
-void CubeInit(ProgramWorld &program, std::vector<GLuint> &indices);
+void CubeInit(const ProgramWorld &program, std::vector<GLuint> &indices);
 
 #endif
 

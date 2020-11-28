@@ -12,9 +12,10 @@ def C_draw_function(index, prefix = ""):
     return "void " + prefix + "Draw" + str(index) + "(const std::function<void()> &draw) const"
 
 class Renderer:
-    def __init__(self, name, shaderlist):
+    def __init__(self, name, shaderlist, render_order):
         self.name = name
         self.shaderlist = shaderlist
+        self.render_order = render_order
 
     def module_name(self):
         return "Program" + self.name
@@ -34,7 +35,7 @@ class Renderer:
         else:
             prefix = ""
 
-        args = ", ".join("GLsizei width" + str(i) + ", GLsizei height" + str(i) for i in range(len(self.shaderlist)-1))
+        args = ", ".join("GLsizei width" + str(i) + ", GLsizei height" + str(i) for i in range(len(self.render_order)-1))
         args += ",\n" + ",\n".join(s.C_constructor_args(str(i)) for i, s in enumerate(self.shaderlist))
         
         return prefix + self.C_name() + "(" + args + ")"
@@ -43,14 +44,14 @@ class Renderer:
         return "\n".join(C_program_getter(s.C_name(), i) + ";" for i, s in enumerate(self.shaderlist))
 
     def C_fb_getters(self):
-        return "\n".join(C_fb_getter(i) + ";" for i in range(len(self.shaderlist)-1))
+        return "\n".join(C_fb_getter(i) + ";" for i in range(len(self.render_order)-1))
 
     def C_draw_functions(self):
-        return "\n".join(C_draw_function(i) + ";" for i in range(len(self.shaderlist)))
+        return "\n".join(C_draw_function(i) + ";" for i in range(len(self.render_order)))
 
     def C_class(self):
         program_members = "\n".join(s.C_name() + " m" + s.C_name() + ";" for s in self.shaderlist)
-        framebuffer_members = "\n".join("Framebuffer fb" + str(i) + ";" for i in range(len(self.shaderlist) - 1))
+        framebuffer_members = "\n".join("Framebuffer fb" + str(i) + ";" for i in range(len(self.render_order) - 1))
 
         return    "class " + self.C_name() \
                 + "\n{\n    public:\n" \
@@ -67,7 +68,7 @@ class Renderer:
         ret = self.C_constructor(True) + ":\n"
         ret += indent(",\n".join("m" + s.C_name() + "(" + s.C_constructor_args(str(i), True) + ")" for i, s in enumerate(self.shaderlist)), 1)
         ret += ",\n"
-        ret += indent(",\n".join("fb" + str(i) + "(width" + str(i) + ", height" + str(i) + ")" for i in range(len(self.shaderlist)-1)), 1)
+        ret += indent(",\n".join("fb" + str(i) + "(width" + str(i) + ", height" + str(i) + ")" for i in range(len(self.render_order)-1)), 1)
         ret += "\n{\n}\n"
         return ret
 
@@ -75,13 +76,15 @@ class Renderer:
         return "\n".join(C_program_getter(s.C_name(), i, self.C_name() + "::") + "\n{\n    return m" + s.C_name() + ";\n}\n" for i, s in enumerate(self.shaderlist))
 
     def C_fb_getters_source(self):
-        return "\n".join(C_fb_getter(i, self.C_name() + "::") + "\n{\n    return fb" + str(i) + ";\n}\n" for i in range(len(self.shaderlist)-1))
+        return "\n".join(C_fb_getter(i, self.C_name() + "::") + "\n{\n    return fb" + str(i) + ";\n}\n" for i in range(len(self.render_order)-1))
 
     def C_draw_functions_source(self):
         ret = ""
-        for i, s in enumerate(self.shaderlist):
-            programname = "m" + s.C_name()
-            last = (i == len(self.shaderlist) - 1)
+        for i, pname in enumerate(self.render_order):
+            shader = next(s for s in self.shaderlist if s.name == pname)
+
+            programname = "m" + shader.C_name()
+            last = (i == len(self.render_order) - 1)
 
             ret +=    C_draw_function(i, self.C_name() + "::") \
                     + "\n{\n" \
@@ -104,5 +107,5 @@ class Renderer:
                 + self.C_fb_getters_source() \
                 + self.C_draw_functions_source()
 
-def to_renderer(name, shaderlist):
-    return Renderer(name, shaderlist)
+def to_renderer(name, shaderlist, render_order):
+    return Renderer(name, shaderlist, render_order)

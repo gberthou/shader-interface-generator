@@ -6,8 +6,7 @@
 #include <utils.h>
 #include <framebuffer.h>
 
-#include "shaders/ProgramWorld.h"
-#include "shaders/ProgramScreen.h"
+#include "shaders/ProgramDrawTechnique.h"
 #include "cube.h"
 
 static void initGL(unsigned int width, unsigned int height)
@@ -43,20 +42,8 @@ static void initSquare(const ProgramScreen &program)
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 }
 
-static void drawWorld(const ProgramWorld &program, const std::vector<GLuint> &cubeIndices)
+static void drawScreen()
 {
-    program.Apply();
-    program.Bind();
-
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glDrawElements(GL_TRIANGLES, cubeIndices.size(), GL_UNSIGNED_INT, cubeIndices.data());
-}
-
-static void drawScreen(const ProgramScreen &program)
-{
-    program.Apply();
-    program.Bind();
-
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }
@@ -69,11 +56,15 @@ int main(void)
     UI ui(width, height, "Hello World!");
 
     initGL(width, height);
-    Framebuffer framebuffer0(width, height);
-    Framebuffer framebuffer1(width, height);
 
-    ProgramWorld  programWorld (FileContents("shaders/World.vert"),  FileContents("shaders/World.frag"));
-    ProgramScreen programScreen(FileContents("shaders/Screen.vert"), FileContents("shaders/Screen.frag"));
+    ProgramDrawTechnique renderer(
+        width, height,
+        width, height,
+        FileContents("shaders/World.vert"), FileContents("shaders/World.frag"),
+        FileContents("shaders/Screen.vert"), FileContents("shaders/Screen.frag")
+    );
+    const auto &programWorld  = renderer.GetProgram0();
+    const auto &programScreen = renderer.GetProgram1();
 
     std::vector<GLuint> cubeIndices;
     CubeInit(programWorld, cubeIndices);
@@ -91,13 +82,12 @@ int main(void)
         glm::vec3(0, 0, 1)
     );
     programWorld.Setuview(mat2array(view));
-
  
     // Bind the framebuffers to TEXTURE0 and TEXTURE1
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, framebuffer0.GetColorTexture());
+    glBindTexture(GL_TEXTURE_2D, renderer.GetFramebuffer0().GetColorTexture());
     glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, framebuffer1.GetColorTexture());
+    glBindTexture(GL_TEXTURE_2D, renderer.GetFramebuffer1().GetColorTexture());
 
     float t = 0.;
 
@@ -109,25 +99,24 @@ int main(void)
         t += .01;
 
         // First: Render World onto framebuffer
-        framebuffer0.Bind();
-        drawWorld(programWorld, cubeIndices);
-        framebuffer0.Unbind();
+        renderer.Draw0([&]{
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            glDrawElements(GL_TRIANGLES, cubeIndices.size(), GL_UNSIGNED_INT, cubeIndices.data());
+        });
 
         // Second: First pass (horizontal)
         programScreen.Apply();
         programScreen.Setscreen(0);
         programScreen.Sethorizontal(true);
         programScreen.Setnstep(width / 4);
-        framebuffer1.Bind();
-        drawScreen(programScreen);
-        framebuffer1.Unbind();
+        renderer.Draw1(drawScreen);
 
         // Third: Second pass (vertical)
         //programScreen.Apply();
         programScreen.Setscreen(1);
         programScreen.Sethorizontal(false);
         programScreen.Setnstep(height / 4);
-        drawScreen(programScreen);
+        renderer.Draw2(drawScreen);
 
         ui.Refresh();
     }
