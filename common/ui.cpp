@@ -15,7 +15,7 @@ UI::UI(unsigned int width, unsigned int height, const char *title)
         
     Window root = DefaultRootWindow(display);
 
-    int attributes[] = {GLX_RGBA, GLX_DEPTH_SIZE, 24, GLX_DOUBLEBUFFER, None};
+    int attributes[] = {GLX_RGBA, GLX_DEPTH_SIZE, 24, GLX_STENCIL_SIZE, 8, GLX_DOUBLEBUFFER, None};
     XVisualInfo *visualInfo = glXChooseVisual(display, 0, attributes);
     if(visualInfo == NULL)
     {

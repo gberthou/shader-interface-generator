@@ -37,12 +37,12 @@ for filename in sys.argv[1:]:
         os.chdir("shaders")
         data = json.load(f)
 
-        if not RENDERORDER in data.keys():
-            render_order = list(i[NAME] for i in data[PROGRAMS])
-        else:
-            render_order = list(data[RENDERORDER])
-
         if PROGRAMS in data.keys(): # Drawing technique composed of several passes
+            if not RENDERORDER in data.keys():
+                render_order = list(i[NAME] for i in data[PROGRAMS])
+            else:
+                render_order = list(data[RENDERORDER])
+
             shaders = list(generate_interface(program) for program in data[PROGRAMS])
             renderer = to_renderer(data[NAME], shaders, render_order)
 
