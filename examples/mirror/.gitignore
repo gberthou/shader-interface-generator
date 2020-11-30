@@ -1,0 +1,3 @@
+mirror
+shaders/*.cpp
+shaders/*.h
