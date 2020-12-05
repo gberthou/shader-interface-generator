@@ -2,8 +2,9 @@ COMMONDIR = ../../common/
 SHADERDIR = shaders/
 
 CC=g++
-CFLAGS=-std=c++2a -Wall -Wextra -pedantic -Werror -O3
+CFLAGS=-std=c++2a -Wall -Wextra -pedantic -Werror -O3 -ffunction-sections -fdata-sections
 INCLUDES=-I$(COMMONDIR)
+LDFLAGS=-Wl,--gc-sections
 LIBS=-lX11 -lGLX -lGL
 
 CFILES=$(wildcard *.cpp) $(wildcard $(COMMONDIR)*.cpp)
@@ -20,7 +21,7 @@ OFILES=$(patsubst %.cpp,%.o,$(CFILES)) $(SHADERS_O)
 	$(CC) $(CFLAGS) -o $@ -c $< $(INCLUDES)
 
 $(BIN): $(OFILES)
-	$(CC) -o $@ $^ $(LIBS)
+	$(CC) $(LDFLAGS) -o $@ $^ $(LIBS)
 
 $(SHADERS_CPP) $(SHADERS_H): $(SHADERGENERATE) $(SHADERS)
 	python3 $^
