@@ -101,7 +101,7 @@ int main(void)
     glm::vec3 target(0, 0, 0);
     const glm::vec3 vertical(0, 0, 1);
 
-    auto proj = mat2array(glm::perspective((float)M_PI * 80.f / 180.f, static_cast<float>(width)/height, 1.f, 100.f));
+    const auto proj = mat2array(glm::perspective((float)M_PI * 80.f / 180.f, static_cast<float>(width)/height, 1.f, 100.f));
     auto mirrorProj = proj;
     mirrorProj[0] = -mirrorProj[0];
 
