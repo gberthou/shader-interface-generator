@@ -45,8 +45,8 @@ def is_scalar(_type):
 def Ctype_of(_type):
     if _type == "uint" or _type == "bool":
         return "GLuint"
-    if _type == "GLint":
-        return "int32_t"
+    if _type == "int":
+        return "GLint"
     if _type == "double" or _type == "float":
         return "GLfloat"
 
