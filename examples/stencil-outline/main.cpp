@@ -58,11 +58,11 @@ int main(void)
     CubeInit(programWorld, cubeIndices);
 
     glm::mat4 view = glm::lookAt(
-        glm::vec3(20, 10, .5),
-        glm::vec3(0, 0, 0),
+        glm::vec3(10, 6, 2),
+        glm::vec3(0, NCUBES, 0),
         glm::vec3(0, 0, 1)
     );
-    glm::mat4 proj = glm::perspective(70.f, static_cast<float>(width)/height, 1.f, 100.f);
+    glm::mat4 proj = glm::perspective(static_cast<float>(M_PI) * 70.f / 180.f, static_cast<float>(width)/height, 1.f, 100.f);
 
     // Set the uniform variables of the world program
     programWorld.Apply();

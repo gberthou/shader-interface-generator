@@ -75,11 +75,11 @@ int main(void)
 
     // Set the uniform variables of the world program
     programWorld.Apply();
-    glm::mat4 proj = glm::perspective(100.f, static_cast<float>(width)/height, 1.f, 100.f);
+    glm::mat4 proj = glm::perspective(static_cast<float>(M_PI) * 100.f / 180.f, static_cast<float>(width)/height, 1.f, 100.f);
     programWorld.Setuproj(mat2array(proj));
 
     glm::mat4 view = glm::lookAt(
-        glm::vec3(10, 10, 5),
+        glm::vec3(2, 2, 1),
         glm::vec3(0, 0, 0),
         glm::vec3(0, 0, 1)
     );
