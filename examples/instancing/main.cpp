@@ -1,8 +1,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include <gl.h>
+#include <GLFW/glfw3.h>
 #include <glmutils.h>
-#include <ui.h>
 #include <utils.h>
 #include <framebuffer.h>
 
@@ -24,7 +24,9 @@ int main(void)
     const int ntheta = 128;
     const int nphi = 128;
 
-    UI ui(width, height, "Instancing");
+    glfwInit();
+    GLFWwindow *window = glfwCreateWindow(width, height, "Instancing", 0, 0);
+    glfwMakeContextCurrent(window);
 
     initGL(width, height);
 
@@ -50,7 +52,7 @@ int main(void)
 
     float t = 0.;
 
-    while(ui.PollEvent())
+    while(!glfwWindowShouldClose(window))
     {
         // Update model matrix
         programWorld.Apply();
@@ -59,8 +61,13 @@ int main(void)
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glDrawElementsInstanced(GL_TRIANGLES, cubeIndices.size(), GL_UNSIGNED_INT, cubeIndices.data(), ntheta * nphi);
-        ui.Refresh();
+
+        glfwSwapBuffers(window);
+        glfwPollEvents();
     }
+
+    glfwDestroyWindow(window);
+    glfwTerminate();
 
     return EXIT_SUCCESS;
 }

@@ -1,6 +1,7 @@
 #include <cmath>
+
 #include <gl.h>
-#include <ui.h>
+#include <GLFW/glfw3.h>
 #include <utils.h>
 
 #include "shaders/ProgramWorld.h"
@@ -29,7 +30,9 @@ int main(void)
     const unsigned int width = 800;
     const unsigned int height = 600;
 
-    UI ui(width, height, "Hello World!");
+    glfwInit();
+    GLFWwindow *window = glfwCreateWindow(width, height, "Raymarching", 0, 0);
+    glfwMakeContextCurrent(window);
 
     initGL(width, height);
 
@@ -42,7 +45,7 @@ int main(void)
     program.Setd(1);
     program.Setratio(static_cast<float>(width) / height);
 
-    while(ui.PollEvent())
+    while(!glfwWindowShouldClose(window))
     {
         program.Bind();
         program.Sett(t);
@@ -50,8 +53,13 @@ int main(void)
 
         glClear(GL_COLOR_BUFFER_BIT);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-        ui.Refresh();
+
+        glfwSwapBuffers(window);
+        glfwPollEvents();
     }
+
+    glfwDestroyWindow(window);
+    glfwTerminate();
 
     return EXIT_SUCCESS;
 }

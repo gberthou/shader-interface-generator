@@ -1,9 +1,8 @@
-#include <iostream>
 #include <glm/gtc/matrix_transform.hpp>
 
 #include <gl.h>
+#include <GLFW/glfw3.h>
 #include <glmutils.h>
-#include <ui.h>
 #include <utils.h>
 #include <framebuffer.h>
 
@@ -46,7 +45,9 @@ int main(void)
     const unsigned int width = 800;
     const unsigned int height = 600;
 
-    UI ui(width, height, "Hello World!");
+    glfwInit();
+    GLFWwindow *window = glfwCreateWindow(width, height, "Stencil Outline", 0, 0);
+    glfwMakeContextCurrent(window);
 
     initGL(width, height);
 
@@ -85,7 +86,7 @@ int main(void)
     // bits >= 5: 0 = unselected, 1 = selected
     unsigned int selected = 0;
 
-    while(ui.PollEvent())
+    while(!glfwWindowShouldClose(window))
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
@@ -125,13 +126,17 @@ int main(void)
         glStencilFunc(GL_ALWAYS, 1, 0xff);
         glEnable(GL_DEPTH_TEST);
 
-        ui.Refresh();
+        glfwSwapBuffers(window);
+        glfwPollEvents();
 
         // Update cubes
         for(auto &cube : cubes)
             cube.t += .02f;
         ++selected;
     }
+
+    glfwDestroyWindow(window);
+    glfwTerminate();
 
     return EXIT_SUCCESS;
 }

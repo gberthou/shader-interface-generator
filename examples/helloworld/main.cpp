@@ -1,5 +1,5 @@
 #include <gl.h>
-#include <ui.h>
+#include <GLFW/glfw3.h>
 #include <utils.h>
 
 #include "shaders/ProgramWorld.h"
@@ -27,7 +27,9 @@ int main(void)
     const unsigned int width = 800;
     const unsigned int height = 600;
 
-    UI ui(width, height, "Hello World!");
+    glfwInit();
+    GLFWwindow *window = glfwCreateWindow(width, height, "Hello World!", 0, 0);
+    glfwMakeContextCurrent(window);
 
     initGL(width, height);
 
@@ -36,15 +38,20 @@ int main(void)
 
     program.Apply();
 
-    while(ui.PollEvent())
+    while(!glfwWindowShouldClose(window))
     {
         program.Apply();
         program.Bind();
 
         glClear(GL_COLOR_BUFFER_BIT);
         glDrawArrays(GL_TRIANGLES, 0, 3);
-        ui.Refresh();
+
+        glfwSwapBuffers(window);
+        glfwPollEvents();
     }
+
+    glfwDestroyWindow(window);
+    glfwTerminate();
 
     return EXIT_SUCCESS;
 }

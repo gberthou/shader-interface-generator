@@ -1,5 +1,5 @@
 #include <gl.h>
-#include <ui.h>
+#include <GLFW/glfw3.h>
 #include <utils.h>
 #include <framebuffer.h>
 
@@ -53,7 +53,9 @@ int main(void)
     const unsigned int width = 800;
     const unsigned int height = 600;
 
-    UI ui(width, height, "Hello World!");
+    glfwInit();
+    GLFWwindow *window = glfwCreateWindow(width, height, "Post Processing", 0, 0);
+    glfwMakeContextCurrent(window);
 
     initGL(width, height);
     ProgramDrawTechnique renderer(
@@ -75,7 +77,7 @@ int main(void)
     programScreen.Bind();
     programScreen.Setscreen(0);
 
-    while(ui.PollEvent())
+    while(!glfwWindowShouldClose(window))
     {
         // First: Render World onto the framebuffer
         renderer.Draw0([]{
@@ -89,8 +91,12 @@ int main(void)
             glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
         });
 
-        ui.Refresh();
+        glfwSwapBuffers(window);
+        glfwPollEvents();
     }
+
+    glfwDestroyWindow(window);
+    glfwTerminate();
 
     return EXIT_SUCCESS;
 }

@@ -5,7 +5,7 @@ CC=g++
 CFLAGS=-std=c++2a -Wall -Wextra -pedantic -Werror -O3 -ffunction-sections -fdata-sections
 INCLUDES=-I$(COMMONDIR)
 LDFLAGS=-Wl,--gc-sections
-LIBS=-lX11 -lGLX -lGL
+LIBS=-lglfw -lGL
 
 CFILES=$(wildcard *.cpp) $(wildcard $(COMMONDIR)*.cpp)
 

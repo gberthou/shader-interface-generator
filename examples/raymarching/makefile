@@ -1,3 +1,3 @@
-BIN=ray
+BIN=raymarching
 
 include ../../common/makebase.mk

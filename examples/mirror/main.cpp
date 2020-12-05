@@ -1,9 +1,8 @@
-#include <iostream>
 #include <glm/gtc/matrix_transform.hpp>
 
 #include <gl.h>
+#include <GLFW/glfw3.h>
 #include <glmutils.h>
-#include <ui.h>
 #include <utils.h>
 #include <framebuffer.h>
 
@@ -89,7 +88,10 @@ int main(void)
     const unsigned int width = 800;
     const unsigned int height = 600;
 
-    UI ui(width, height, "Stencil Mirror");
+    glfwInit();
+    GLFWwindow *window = glfwCreateWindow(width, height, "Stencil Mirror", 0, 0);
+    glfwMakeContextCurrent(window);
+
     initGL(width, height);
 
     ProgramWorld programWorld(FileContents("shaders/World.vert"), FileContents("shaders/World.frag"), FileContents("shaders/World.geo"));
@@ -121,7 +123,7 @@ int main(void)
 
     float t = 0;
 
-    while(ui.PollEvent())
+    while(!glfwWindowShouldClose(window))
     {
         // Update eye and target
         float d = 4 * cos(.24 *t);
@@ -183,12 +185,16 @@ int main(void)
         glStencilFunc(GL_ALWAYS, 1, 0xff);
         glEnable(GL_DEPTH_TEST);
 
-        ui.Refresh();
+        glfwSwapBuffers(window);
+        glfwPollEvents();
 
         // Update cubes
         for(auto &cube : cubes)
             cube.t += .02f;
     }
+
+    glfwDestroyWindow(window);
+    glfwTerminate();
 
     return EXIT_SUCCESS;
 }

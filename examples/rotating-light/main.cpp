@@ -2,7 +2,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include <gl.h>
-#include <ui.h>
+#include <GLFW/glfw3.h>
 #include <glmutils.h>
 #include <utils.h>
 
@@ -22,7 +22,9 @@ int main(void)
     const unsigned int width = 800;
     const unsigned int height = 600;
 
-    UI ui(width, height, "Rotating Light");
+    glfwInit();
+    GLFWwindow *window = glfwCreateWindow(width, height, "Rotating Light", 0, 0);
+    glfwMakeContextCurrent(window);
 
     initGL(width, height);
 
@@ -45,7 +47,7 @@ int main(void)
 
     float theta = 0.f;
 
-    while(ui.PollEvent())
+    while(!glfwWindowShouldClose(window))
     {
         program.Apply();
         program.Bind();
@@ -58,10 +60,14 @@ int main(void)
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glDrawElements(GL_TRIANGLES, cubeIndices.size(), GL_UNSIGNED_INT, cubeIndices.data());
-        ui.Refresh();
+        glfwSwapBuffers(window);
+        glfwPollEvents();
 
         theta += 0.05f;
     }
+
+    glfwDestroyWindow(window);
+    glfwTerminate();
 
     return EXIT_SUCCESS;
 }

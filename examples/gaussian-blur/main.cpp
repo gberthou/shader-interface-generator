@@ -1,8 +1,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include <gl.h>
+#include <GLFW/glfw3.h>
 #include <glmutils.h>
-#include <ui.h>
 #include <utils.h>
 #include <framebuffer.h>
 
@@ -53,7 +53,9 @@ int main(void)
     const unsigned int width = 800;
     const unsigned int height = 600;
 
-    UI ui(width, height, "Hello World!");
+    glfwInit();
+    GLFWwindow *window = glfwCreateWindow(width, height, "Gaussian Blur", 0, 0);
+    glfwMakeContextCurrent(window);
 
     initGL(width, height);
 
@@ -91,7 +93,7 @@ int main(void)
 
     float t = 0.;
 
-    while(ui.PollEvent())
+    while(!glfwWindowShouldClose(window))
     {
         // Update model matrix
         programWorld.Apply();
@@ -118,8 +120,12 @@ int main(void)
         programScreen.Setnstep(height / 4);
         renderer.Draw2(drawScreen);
 
-        ui.Refresh();
+        glfwSwapBuffers(window);
+        glfwPollEvents();
     }
+
+    glfwDestroyWindow(window);
+    glfwTerminate();
 
     return EXIT_SUCCESS;
 }
