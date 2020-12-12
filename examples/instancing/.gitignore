@@ -1,3 +1,4 @@
 instancing
+*.exe
 shaders/*.cpp
 shaders/*.h

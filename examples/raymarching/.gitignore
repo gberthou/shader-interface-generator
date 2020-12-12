@@ -1,3 +1,4 @@
 raymarching
+*.exe
 shaders/*.cpp
 shaders/*.h

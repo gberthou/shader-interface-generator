@@ -5,7 +5,6 @@ CC=g++
 CFLAGS=-std=c++2a -Wall -Wextra -pedantic -Werror -O3 -ffunction-sections -fdata-sections
 INCLUDES=-I$(COMMONDIR)
 LDFLAGS=-Wl,--gc-sections
-LIBS=-lglfw -lGL
 
 CFILES=$(wildcard *.cpp) $(wildcard $(COMMONDIR)*.cpp)
 
@@ -17,6 +16,19 @@ SHADERS_O=$(patsubst $(SHADERDIR)%.cfg,$(SHADERDIR)Program%.o,$(SHADERS))
 
 OFILES=$(patsubst %.cpp,%.o,$(CFILES)) $(SHADERS_O)
 
+CLEAN = $(BIN) $(OFILES) $(SHADERS_H) $(SHADERS_CPP)
+
+ifdef OS # WINDOWS
+	RM=del
+	CLEAN := $(subst /,\,$(CLEAN))
+	
+	CFLAGS := $(CFLAGS) -Wno-cast-function-type
+	LIBS=-lglfw3 -lgdi32
+else
+	RM = rm -f
+	LIBS=-lglfw -lGL
+endif
+
 %.o: %.cpp $(SHADERS_H)
 	$(CC) $(CFLAGS) -o $@ -c $< $(INCLUDES)
 
@@ -27,4 +39,4 @@ $(SHADERS_CPP) $(SHADERS_H): $(SHADERGENERATE) $(SHADERS)
 	python3 $^
 
 clean:
-	rm -f $(BIN) $(OFILES) $(SHADERS_H) $(SHADERS_CPP)
+	$(RM) $(CLEAN)

@@ -1,3 +1,4 @@
 gaussian-blur
+*.exe
 shaders/*.cpp
 shaders/*.h

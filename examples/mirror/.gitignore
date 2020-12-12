@@ -1,3 +1,4 @@
 mirror
+*.exe
 shaders/*.cpp
 shaders/*.h

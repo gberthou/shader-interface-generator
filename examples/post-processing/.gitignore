@@ -1,3 +1,4 @@
 post-processing
+*.exe
 shaders/*.cpp
 shaders/*.h

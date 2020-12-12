@@ -1,3 +1,4 @@
 stencil-outline
+*.exe
 shaders/*.cpp
 shaders/*.h

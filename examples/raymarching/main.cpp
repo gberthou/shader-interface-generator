@@ -1,5 +1,3 @@
-#include <cmath>
-
 #include <gl.h>
 #include <GLFW/glfw3.h>
 #include <utils.h>
@@ -43,7 +41,7 @@ int main(void)
 
     program.Apply();
     program.Setd(1);
-    program.Setratio(static_cast<float>(width) / height);
+    program.Setdimensions({width, height});
 
     while(!glfwWindowShouldClose(window))
     {

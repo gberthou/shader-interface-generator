@@ -1,5 +1,5 @@
-#include <cmath>
 #include <glm/gtc/matrix_transform.hpp>
+#include <mathutils.h>
 
 #include <gl.h>
 #include <GLFW/glfw3.h>

@@ -1,3 +1,4 @@
 rotating-light
+*.exe
 shaders/*.cpp
 shaders/*.h

@@ -1,8 +1,8 @@
 #version 130
 
-uniform float ratio;
 uniform float d;
 uniform float t;
+uniform uvec2 dimensions;
 
 float smin(float x, float y)
 {
@@ -44,7 +44,9 @@ void main()
     const uint MAXITER = 100u;
     const float EPSILON = 1e-5;
     vec3 pos = vec3(0.0, 0.0, -d);
-    vec3 u = normalize(vec3(gl_PointCoord.x * ratio, gl_PointCoord.y, d));
+	
+    vec2 screen = 2.0 * gl_FragCoord.xy / dimensions.y - vec2(float(dimensions.x) / dimensions.y, 1.0);
+    vec3 u = normalize(vec3(screen, d));
 
     float dist = sdfScene(pos);
     float depth = dist;
