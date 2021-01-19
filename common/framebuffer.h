@@ -6,7 +6,7 @@
 class Framebuffer
 {
     public:
-        Framebuffer(GLsizei width, GLsizei height);
+        Framebuffer(GLsizei width, GLsizei height, bool textureFiltering = true);
         ~Framebuffer();
 
         void Bind() const;
