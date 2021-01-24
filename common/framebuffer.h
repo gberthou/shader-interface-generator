@@ -6,18 +6,19 @@
 class Framebuffer
 {
     public:
-        Framebuffer(GLsizei width, GLsizei height, bool textureFiltering = true);
+        Framebuffer(GLsizei width, GLsizei height, size_t colorAttachments, bool textureFiltering = true);
         ~Framebuffer();
 
         void Bind() const;
         static void Unbind();
 
-        GLuint GetColorTexture() const;
+        GLuint GetColorTexture(size_t index) const;
         GLuint GetDepthTexture() const;
 
     protected:
+        size_t colorAttachments;
         GLuint fb;
-        GLuint textures[2];
+        GLuint *textures;
 };
 
 #endif

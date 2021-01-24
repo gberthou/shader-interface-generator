@@ -25,8 +25,8 @@ static void initSquare(const ProgramWorld &program)
 
 int main(void)
 {
-    const unsigned int width = 800;
-    const unsigned int height = 600;
+    const unsigned int width = 1929;
+    const unsigned int height = 1080;
 
     glfwInit();
     GLFWwindow *window = glfwCreateWindow(width, height, "Raymarching", 0, 0);

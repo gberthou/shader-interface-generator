@@ -68,7 +68,7 @@ class Renderer:
         ret = self.C_constructor(True) + ":\n"
         ret += indent(",\n".join("m" + s.C_name() + "(" + s.C_constructor_args(str(i), True) + ")" for i, s in enumerate(self.shaderlist)), 1)
         ret += ",\n"
-        ret += indent(",\n".join("fb" + str(i) + "(width" + str(i) + ", height" + str(i) + ")" for i in range(len(self.render_order)-1)), 1)
+        ret += indent(",\n".join("fb" + str(i) + "(width" + str(i) + ", height" + str(i) + ", 1)" for i in range(len(self.render_order)-1)), 1)
         ret += "\n{\n}\n"
         return ret
 

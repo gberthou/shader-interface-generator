@@ -14,6 +14,7 @@ void main()
 
     int index = (gl_VertexID % 6);
     int i = gl_VertexID / 6;
+    //i = 64 * 1000 - 1 - i;
 
     float y = float(i >> 6) + vertices[index].y;
     float w = 200.0;

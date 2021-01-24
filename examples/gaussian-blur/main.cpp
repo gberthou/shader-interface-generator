@@ -88,9 +88,9 @@ int main(void)
  
     // Bind the framebuffers to TEXTURE0 and TEXTURE1
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, renderer.GetFramebuffer0().GetColorTexture());
+    glBindTexture(GL_TEXTURE_2D, renderer.GetFramebuffer0().GetColorTexture(0));
     glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, renderer.GetFramebuffer1().GetColorTexture());
+    glBindTexture(GL_TEXTURE_2D, renderer.GetFramebuffer1().GetColorTexture(0));
 
     float t = 0.;
 
